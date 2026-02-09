@@ -14,7 +14,7 @@ class Client(Base, PrimaryKeyMixin, TimestampMixin):
 
     name: Mapped[str] = mapped_column("name", nullable=False)
     address: Mapped[str] = mapped_column("address", nullable=False)
-    orders: Mapped[List["Order"]] = mapped_column("clients", backpopulate="clients")
+    orders: Mapped[List["Order"]] = relationship("Order", back_populates="client")
 
 
 class Order(Base, PrimaryKeyMixin, TimestampMixin):
@@ -26,7 +26,7 @@ class Order(Base, PrimaryKeyMixin, TimestampMixin):
     client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
     client: Mapped["Client"] = relationship("Client", back_populates="orders")
     order_products: Mapped[List["OrderProducts"]] = relationship(
-        "Product", back_populate="order"
+        "OrderProducts", back_populates="order"
     )
 
 
@@ -39,31 +39,12 @@ class Category(Base, PrimaryKeyMixin, TimestampMixin):
     products: Mapped[List["Product"]] = relationship(
         "Product", back_populates="category"
     )
-    parent_category: Mapped["Category"] = relationship(
-        "Category", back_populate="categories"
-    )
-    child_category: Mapped[List["Category"]] = relationship(
-        "Category", back_populate="categories"
-    )
-
-
-class CategoryRels(Base, PrimaryKeyMixin, TimestampMixin):
-    """Category Rels table"""
-
-    __tablename__ = "categories_rels"
-
-    parent_category_id: Mapped[int] = mapped_column(
-        ForeignKey("categories.id"), nullable=False
-    )
-    parent_category: Mapped["Category"] = relationship(
-        "Category", back_populates="category_rels"
-    )
-
-    child_category_id: Mapped[int] = mapped_column(
-        ForeignKey("categories.id"), nullable=False
-    )
-    child_category: Mapped["Category"] = relationship(
-        "Category", back_populates="category_rels"
+    parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
+    parent: Mapped["Category"] = relationship(
+        "Category",
+        remote_side="Category.id",
+        back_populates="children",
+        foreign_keys=[parent_id],
     )
 
 
@@ -75,10 +56,10 @@ class Product(Base, PrimaryKeyMixin, TimestampMixin):
     title: Mapped[str] = mapped_column("title", nullable=False)
     quantity: Mapped[int] = mapped_column(default=0, nullable=False)
     price: Mapped[float] = mapped_column(default=0, nullable=False)
-    category_id: Mapped["Category"] = mapped_column(ForeignKey("categories.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     category: Mapped["Category"] = relationship("Category", back_populates="products")
     order_products: Mapped[List["OrderProducts"]] = relationship(
-        "Product", back_populate="products"
+        "OrderProducts", back_populates="product"
     )
 
 
