@@ -16,3 +16,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-root
 FROM builder AS runtime
 
 COPY ./src ./src
+COPY alembic.ini alembic.ini

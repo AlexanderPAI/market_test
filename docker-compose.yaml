@@ -7,6 +7,31 @@ services:
       dockerfile: src/backend.dockerfile
     ports:
       - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./src/infrastructure/db/alembic/versions:/app/src/infrastructure/db/alembic/versions:delegated
+    depends_on:
+      - db
     command: >
       sh -c "python -m src.app"
     restart: on-failure
+
+  db:
+      container_name: market_db
+      image: postgres:17
+      volumes:
+        - postgres_data:/var/lib/postgresql/data:rw
+      ports:
+        - "5432:5432"
+      env_file:
+        - .env
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_PORT: ${POSTGRES_PORT}
+        POSTGRES_DB: ${POSTGRES_DB}
+      restart: on-failure
+
+volumes:
+  postgres_data:
