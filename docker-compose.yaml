@@ -1,0 +1,12 @@
+services:
+
+  app:
+    container_name: market_app
+    build:
+      context: .
+      dockerfile: src/backend.dockerfile
+    ports:
+      - "8080:8080"
+    command: >
+      sh -c "python -m src.app"
+    restart: on-failure
