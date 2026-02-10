@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,9 +22,8 @@ class Order(Base, PrimaryKeyMixin, TimestampMixin):
 
     __tablename__ = "orders"
 
-    name: Mapped[str] = mapped_column("name", nullable=False)
-    client_id: Mapped[int] = mapped_column(ForeignKey("clients.id"), nullable=False)
-    client: Mapped["Client"] = relationship("Client", back_populates="orders")
+    client_id: Mapped[Optional[int]] = mapped_column(ForeignKey("clients.id"))
+    client: Mapped[Optional["Client"]] = relationship("Client", back_populates="orders")
     order_products: Mapped[List["OrderProducts"]] = relationship(
         "OrderProducts", back_populates="order"
     )
@@ -38,6 +37,9 @@ class Category(Base, PrimaryKeyMixin, TimestampMixin):
     title: Mapped[str] = mapped_column("title", nullable=False)
     products: Mapped[List["Product"]] = relationship(
         "Product", back_populates="category"
+    )
+    children: Mapped[List["Category"]] = relationship(
+        "Category", back_populates="parent"
     )
     parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     parent: Mapped["Category"] = relationship(
