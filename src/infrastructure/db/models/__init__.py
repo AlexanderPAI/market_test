@@ -6,3 +6,12 @@ from src.infrastructure.db.models.market import (  # noqa
     OrderProducts,
     Product,
 )
+
+__all__ = [
+    "Base",
+    "Category",
+    "Client",
+    "Order",
+    "OrderProducts",
+    "Product",
+]

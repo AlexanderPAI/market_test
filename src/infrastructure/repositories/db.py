@@ -20,8 +20,10 @@ class DBRepository(Generic[ModelType]):
         result = await self._session.execute(statement)
         return result.scalars().first()
 
-    async def add(self, obj: Dict[str, Any]) -> ModelType:
+    async def add(self, obj: Optional[Dict[str, Any]] = None) -> ModelType:
         """Add a new entity to the database"""
+        if obj is None:
+            obj = {}
         db_obj = self._model(**obj)
         self._session.add(db_obj)
         await self._session.commit()
